@@ -5,6 +5,10 @@ using UnityEngine;
 public class Character : MonoBehaviour {
 
     bool hasMoved = false;
+    public Animator animator;
+    public Sprite WalkDown;
+    public Sprite WalkLeft;
+    public Sprite WalkRight;
     // Use this for initialization
     void Start () {
 		
@@ -13,6 +17,7 @@ public class Character : MonoBehaviour {
     // Update is called once per frame
     void Update()
     {
+
         //if (!hasMoved)
         //{
         //    var move = new Vector3(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"), 0);
@@ -24,6 +29,8 @@ public class Character : MonoBehaviour {
     public void Up()
     {
         var move = new Vector3(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"), 0);
+        //this.GetComponent<Animation>().Play("WalkingUp");
+        animator.SetTrigger("moveDown");
         transform.position += (move + new Vector3(0, 1, 0));
     }
 
