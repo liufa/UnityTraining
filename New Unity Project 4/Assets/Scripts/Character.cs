@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Character : MonoBehaviour {
 
-    bool hasMoved = false;
+  //  bool hasMoved = false;
     public Animator animator;
     public Sprite WalkDown;
     public Sprite WalkLeft;

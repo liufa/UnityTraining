@@ -7,31 +7,55 @@ using UnityEngine.UI;
 public class Hero : MonoBehaviour {
 
     public Animator animator;
+    private Vector3 moveDestination;
+    private float moveTime = 0.0f;
+    public GameObject buttonPrefab;
+    private int buttonCount = 0;
+    public int buttonWidth = 30;
     // Use this for initialization
     public void Down()
     {
+        if (moveTime <= 0.0f)
+        {
+            animator.SetTrigger("moveDown");
+            moveDestination = transform.position + new Vector3(0, -1f, 0);
+            moveTime = 1.0f;
 
-        MakeButton("Down");
+        }
 
-        var move = GameObject.Find("Hero").transform.position;
-        animator.SetTrigger("moveDown");
+        MakeButton("⇩");        
+    }
 
-        transform.position = Vector3.Lerp(move, move + new Vector3(0, -1f, 0), 1f); 
-
-        
+    private void Start()
+    {
+        moveDestination = transform.position;
     }
 
     public void MakeButton(string direction)
     {
         
-        GameObject button = new GameObject();
-        button.AddComponent<RectTransform>();
-        button.AddComponent<Button>();
-        button.transform.position = new Vector3(-0,0,0);
-        button.GetComponent<RectTransform>().SetParent(GameObject.Find("CommandPanel").transform);
-        button.SetActive(true);
-        
-        // button.active = false;
-        // (button.GetComponentInChildren(typeof(Text), true) as Text).text = direction;
+        GameObject button = (GameObject)Instantiate(buttonPrefab);
+
+        var panel = GameObject.Find("CommandPanel");
+        button.transform.position = panel.transform.position;
+        button.GetComponentsInChildren<Text>()[0].text = direction;
+        button.GetComponent<RectTransform>().SetParent(panel.transform);
+        button.GetComponent<RectTransform>().SetInsetAndSizeFromParentEdge(RectTransform.Edge.Left, (buttonCount)* buttonWidth, buttonWidth);
+        button.layer = 5;
+        buttonCount++;
+    }
+
+    public void Update()
+    {
+        if (moveTime > 0.0f)
+        {
+            moveTime -= Time.deltaTime;
+            transform.position = Vector3.Lerp(moveDestination, transform.position, moveTime);
+
+            if (moveTime <= 0.0f)
+            {
+                animator.SetTrigger("idle");
+            }
+        }
     }
 }
