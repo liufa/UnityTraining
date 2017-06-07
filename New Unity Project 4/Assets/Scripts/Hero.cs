@@ -12,18 +12,40 @@ public class Hero : MonoBehaviour {
     public GameObject buttonPrefab;
     private int buttonCount = 0;
     public int buttonWidth = 30;
+    private string setNeutralTriggerTo = "idle";
     // Use this for initialization
-    public void Down()
-    {
+
+    public void Move(string direction, Vector3 whereToGo, string arrow) {
         if (moveTime <= 0.0f)
         {
-            animator.SetTrigger("moveDown");
-            moveDestination = transform.position + new Vector3(0, -1f, 0);
+            animator.SetTrigger("move"+ direction);
+            moveDestination = transform.position + whereToGo;
             moveTime = 1.0f;
-
+            setNeutralTriggerTo =  direction.ToLower()+"Idle";
         }
 
-        MakeButton("⇩");        
+        MakeButton(arrow);
+    }
+    public void Down()
+    {
+        Move("Down", new Vector3(0, -1f, 0), "⇩"); 
+    }
+
+    public void Up()
+    {
+        Move("Up", new Vector3(0, 1f, 0), "⇧");
+    }
+
+    public void Left()
+    {
+        Move("Left", new Vector3(-1f, 0, 0), "⇦");
+        
+    }
+
+    public void Right()
+    {
+        Move("Right", new Vector3(1f,0, 0), "⇨");
+        
     }
 
     private void Start()
@@ -54,7 +76,7 @@ public class Hero : MonoBehaviour {
 
             if (moveTime <= 0.0f)
             {
-                animator.SetTrigger("idle");
+                animator.SetTrigger(setNeutralTriggerTo);
             }
         }
     }
