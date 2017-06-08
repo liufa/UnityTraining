@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using UnityEngine;
 using UnityEngine.UI;
@@ -13,41 +14,38 @@ public class Hero : MonoBehaviour {
     public GameObject buttonPrefab;
     private int buttonCount = 0;
     public int buttonWidth = 30;
+    private bool isExecuting = false;
     // private string setNeutralTriggerTo = "idle";
     // Use this for initialization
-    private List<HeroAction> HeroActions;
-    public void Move(HeroAction direction, Vector3 whereToGo, string arrow) {
-        if (moveTime <= 0.0f)
-        {
-            animator.SetTrigger("move"+ Enum.GetName(direction.GetType(), direction));
-            moveDestination = transform.position + whereToGo;
-            moveTime = 1.0f;
-
-          //  setNeutralTriggerTo =  direction.ToLower()+"Idle";
-        }
-
-        MakeButton(arrow);
+    private List<MovementAction> HeroActions = new List<MovementAction>();
+    public void StoreAction(MovementAction movementAction) {
+        HeroActions.Add(movementAction);
+        MakeButton(movementAction.IconString);
     }
     public void Down()
     {
-        Move(HeroAction.Down, new Vector3(0, -1f, 0), "⇩"); 
+        StoreAction(new MovementAction(HeroAction.Down, new Vector3(0, -1f, 0), "⇩")); 
     }
 
     public void Up()
     {
-        Move(HeroAction.Up, new Vector3(0, 1f, 0), "⇧");
+        StoreAction(new MovementAction(HeroAction.Up, new Vector3(0, 1f, 0), "⇧"));
     }
 
     public void Left()
     {
-        Move(HeroAction.Left, new Vector3(-1f, 0, 0), "⇦");
+        StoreAction(new MovementAction(HeroAction.Left, new Vector3(-1f, 0, 0), "⇦"));
         
     }
 
     public void Right()
     {
-        Move(HeroAction.Right, new Vector3(1f,0, 0), "⇨");
+        StoreAction(new MovementAction(HeroAction.Right, new Vector3(1f,0, 0), "⇨"));
         
+    }
+
+    public void Execute() {
+        isExecuting = true;
     }
 
     private void Start()
@@ -71,20 +69,33 @@ public class Hero : MonoBehaviour {
 
     public void Update()
     {
-        if (moveTime > 0.0f)
+        if (isExecuting)
         {
-            moveTime -= Time.deltaTime;
-            transform.position = Vector3.Lerp(moveDestination, transform.position, moveTime);
-
-            //if (moveTime <= 0.0f)
-            //{
-            //    return;
-            //    //    animator.SetTrigger(setNeutralTriggerTo);
-            //}
+            if (HeroActions.Any())
+            {
+                if (moveTime <= 0.0f)
+                {
+                    var heroAction = HeroActions.ElementAt(0);
+                    animator.SetTrigger("move" + Enum.GetName(heroAction.Action.GetType(), heroAction.Action));
+                    moveDestination = transform.position + heroAction.Vector;
+                    moveTime = 1.0f;
+                    HeroActions.RemoveAt(0);
+                }
+                else
+                {
+                    if (moveTime > 0.0f)
+                    {
+                        moveTime -= Time.deltaTime;
+                        transform.position = Vector3.Lerp(moveDestination, transform.position, moveTime);
+                    }
+                }
+            }
+            else
+            {
+                isExecuting = false;
+            }
         }
     }
-
-    
 }
 
 public enum HeroAction
@@ -93,4 +104,18 @@ public enum HeroAction
     Right = 2,
     Down = 3,
     Left = 4
+}
+
+public class MovementAction
+{
+    public MovementAction(HeroAction action, Vector3 vector, string iconString)
+    {
+        this.Action = action;
+        this.Vector = vector;
+        this.IconString = iconString;
+    }
+
+    public HeroAction Action { get; private set; }
+    public Vector3 Vector { get; private set; }
+    public string IconString { get; private set; }
 }
