@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
@@ -12,15 +13,16 @@ public class Hero : MonoBehaviour {
     public GameObject buttonPrefab;
     private int buttonCount = 0;
     public int buttonWidth = 30;
-   // private string setNeutralTriggerTo = "idle";
+    // private string setNeutralTriggerTo = "idle";
     // Use this for initialization
-
-    public void Move(string direction, Vector3 whereToGo, string arrow) {
+    private List<HeroAction> HeroActions;
+    public void Move(HeroAction direction, Vector3 whereToGo, string arrow) {
         if (moveTime <= 0.0f)
         {
-            animator.SetTrigger("move"+ direction);
+            animator.SetTrigger("move"+ Enum.GetName(direction.GetType(), direction));
             moveDestination = transform.position + whereToGo;
             moveTime = 1.0f;
+
           //  setNeutralTriggerTo =  direction.ToLower()+"Idle";
         }
 
@@ -28,23 +30,23 @@ public class Hero : MonoBehaviour {
     }
     public void Down()
     {
-        Move("Down", new Vector3(0, -1f, 0), "⇩"); 
+        Move(HeroAction.Down, new Vector3(0, -1f, 0), "⇩"); 
     }
 
     public void Up()
     {
-        Move("Up", new Vector3(0, 1f, 0), "⇧");
+        Move(HeroAction.Up, new Vector3(0, 1f, 0), "⇧");
     }
 
     public void Left()
     {
-        Move("Left", new Vector3(-1f, 0, 0), "⇦");
+        Move(HeroAction.Left, new Vector3(-1f, 0, 0), "⇦");
         
     }
 
     public void Right()
     {
-        Move("Right", new Vector3(1f,0, 0), "⇨");
+        Move(HeroAction.Right, new Vector3(1f,0, 0), "⇨");
         
     }
 
@@ -81,4 +83,14 @@ public class Hero : MonoBehaviour {
             //}
         }
     }
+
+    
+}
+
+public enum HeroAction
+{
+    Up = 1,
+    Right = 2,
+    Down = 3,
+    Left = 4
 }
